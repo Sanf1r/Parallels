@@ -35,7 +35,9 @@ TsmResult AntsLogic::SolveSalesmansProblemParallel() {
 
   TsmResult path;
   path.distance = INFINITY;
+
   CreateAntsParallel();
+  // std::cout << "par create done" << std::endl;
 
   while (counter++ != kMaxLoopsWithNoGains_) {
     AdjMatrix local_pheromone_update;
@@ -43,11 +45,13 @@ TsmResult AntsLogic::SolveSalesmansProblemParallel() {
 
     // ant runs while he still can
     AntRunParallel();
+    // std::cout << "par run done" << std::endl;
     // compare ant result to best
     LocalUpdate(path, &counter, local_pheromone_update);
 
     UpdateGlobalPheromone(local_pheromone_update);
     BrainwashAntsParallel();
+    // std::cout << "par wash done" << std::endl;
   }
 
   return path;
@@ -65,14 +69,8 @@ void AntsLogic::CreateAntsParallel() {
   ants_.reserve(graph_size_);
   std::vector<std::thread> threads;
 
-  for (int x = 0; x < 4; x++) {
-    threads.emplace_back([&]() {
-      int number = x;
-      while (number < graph_size_) {
-        ants_.emplace_back(Ant(number));
-        number += 4;
-      }
-    });
+  for (int x = 0; x < graph_size_; x++) {
+    threads.emplace_back([&, x]() { ants_.emplace_back(Ant(x)); });
   }
 
   for (auto &thread : threads) {
@@ -89,11 +87,19 @@ void AntsLogic::AntRun() {
 }
 
 void AntsLogic::AntRunParallel() {
-  std::for_each(std::execution::par, ants_.begin(), ants_.end(), [&](Ant &ant) {
-    while (ant.GetMove()) {
-      ant.AntMove(graph_, pheromone_, kAlpha_, kBeta_);
-    }
-  });
+  std::vector<std::thread> threads;
+
+  for (auto &ant : ants_) {
+    threads.emplace_back([&]() {
+      while (ant.GetMove()) {
+        ant.AntMove(graph_, pheromone_, kAlpha_, kBeta_);
+      }
+    });
+  }
+
+  for (auto &thread : threads) {
+    thread.join();
+  }
 }
 
 void AntsLogic::LocalUpdate(TsmResult &path, int *counter,
@@ -122,8 +128,15 @@ void AntsLogic::BrainwashAnts() {
 }
 
 void AntsLogic::BrainwashAntsParallel() {
-  std::for_each(std::execution::par, ants_.begin(), ants_.end(),
-                [&](Ant &ant) { ant.BrainwashAnt(); });
+  std::vector<std::thread> threads;
+
+  for (auto &ant : ants_) {
+    threads.emplace_back([&]() { ant.BrainwashAnt(); });
+  }
+
+  for (auto &thread : threads) {
+    thread.join();
+  }
 }
 
 void AntsLogic::UpdateGlobalPheromone(const AdjMatrix &lpu) {

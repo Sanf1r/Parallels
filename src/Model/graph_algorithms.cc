@@ -19,7 +19,7 @@ TsmResult GraphAlgorithms::SolveSalesmansProblem(const Graph& graph) {
 
 TsmResult GraphAlgorithms::SolveSalesmansProblemParallel(const Graph& graph) {
   AntsLogic al_(graph);
-  return al_.SolveSalesmansProblem();
+  return al_.SolveSalesmansProblemParallel();
 }
 
 bool GraphAlgorithms::UndirectedCheck(const Graph& graph) {

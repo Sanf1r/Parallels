@@ -20,6 +20,7 @@ class Ant {
   void BrainwashAnt();
   bool GetMove();
   TsmResult &GetPath();
+  int GetStart() { return start_location_; }  // debug
 
  private:
   TsmResult path_;

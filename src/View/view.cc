@@ -23,13 +23,14 @@ int View::PerformChoice() {
 
 void View::StartEventLoop() {
   while (true) {
+    int loops = 0;
     DisplayMenu();
 
     switch ((Choice)PerformChoice()) {
       case TSP:
-        if (TspIntro()) {
-          Tsp();
-          TspParallel();
+        if (TspIntro() && Input(&loops)) {
+          Tsp(loops);
+          TspParallel(loops);
         }
         break;
 
@@ -43,13 +44,24 @@ void View::StartEventLoop() {
   }
 }
 
+bool View::Input(int* loops) {
+  std::cout << "Please enter number of executions: " << std::endl;
+  std::cin >> *loops;
+  std::cin.clear();
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  if (!std::cin || *loops < 1) {
+    std::cout << "Wrong number of executions!" << std::endl;
+    return false;
+  }
+  return true;
+}
+
 bool View::Load() {
   std::string path;
   std::cout << "Please, enter path to graph file: " << std::endl;
   std::cin >> path;
   if (c_->LoadGraphFromFile(path)) {
     std::cout << "Graph is successfully loaded!" << std::endl;
-    std::cout << "Start calculations..." << std::endl;
     return true;
   } else {
     std::cout << "Something wrong with a file path!" << std::endl;
@@ -64,10 +76,11 @@ bool View::TspIntro() {
   return Load();
 }
 
-void View::Tsp() {
+void View::Tsp(int loops) {
   TsmResult tsm_res;
+  std::cout << "Start sequence calculations..." << std::endl;
   auto t1 = std::chrono::high_resolution_clock::now();
-  tsm_res = std::move(c_->SolveTravelingSalesmanProblem());
+  tsm_res = std::move(c_->SolveTravelingSalesmanProblem(loops));
   auto t2 = std::chrono::high_resolution_clock::now();
   auto total =
       std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
@@ -88,10 +101,11 @@ void View::Tsp() {
   }
 }
 
-void View::TspParallel() {
+void View::TspParallel(int loops) {
   TsmResult tsm_res;
+  std::cout << "Start parallel calculations..." << std::endl;
   auto t1 = std::chrono::high_resolution_clock::now();
-  tsm_res = std::move(c_->SolveTravelingSalesmanProblemParallel());
+  tsm_res = std::move(c_->SolveTravelingSalesmanProblemParallel(loops));
   auto t2 = std::chrono::high_resolution_clock::now();
   auto total =
       std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();

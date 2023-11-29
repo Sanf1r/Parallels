@@ -7,6 +7,7 @@
 
 #include "ant.h"
 #include "graph.h"
+#include "omp.h"
 
 namespace s21 {
 
@@ -15,9 +16,9 @@ class AntsLogic {
   AntsLogic() = delete;
   explicit AntsLogic(const Graph &graph);
 
-  TsmResult SolveSalesmansProblem();
+  TsmResult SolveSalesmansProblem(int loops);
 
-  TsmResult SolveSalesmansProblemParallel();
+  TsmResult SolveSalesmansProblemParallel(int loops);
 
  private:
   Graph graph_;
@@ -25,7 +26,6 @@ class AntsLogic {
   std::vector<Ant> ants_;
 
   int graph_size_ = 0;
-  const int kMaxLoopsWithNoGains_ = 5000;
   const double kAlpha_ = 4.0;
   const double kBeta_ = 1.0;
   const double kQ_ = 1.0;
@@ -37,13 +37,14 @@ class AntsLogic {
   void AntRun();
   void AntRunParallel();
 
-  void LocalUpdate(TsmResult &path, int *counter,
-                   AdjMatrix &local_pheromone_update);
+  void LocalUpdate(TsmResult &path, AdjMatrix &local_pheromone_update);
+  void LocalUpdateParallel(TsmResult &path, AdjMatrix &local_pheromone_update);
 
   void BrainwashAnts();
   void BrainwashAntsParallel();
 
   void UpdateGlobalPheromone(const AdjMatrix &lpu);
+  void UpdateGlobalPheromoneParallel(const AdjMatrix &lpu);
 };
 }  // namespace s21
 

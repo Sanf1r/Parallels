@@ -19,9 +19,9 @@ namespace s21 {
 
 class Model {
  public:
-  TsmResult SolveTravelingSalesmanProblem();
+  TsmResult SolveTravelingSalesmanProblem(int loops);
 
-  TsmResult SolveTravelingSalesmanProblemParallel();
+  TsmResult SolveTravelingSalesmanProblemParallel(int loops);
 
   bool LoadGraphFromFile(const std::string& path);
 

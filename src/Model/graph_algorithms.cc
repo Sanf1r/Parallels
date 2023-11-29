@@ -12,14 +12,16 @@ namespace s21 {
  * @param graph
  * @return TsmResult
  */
-TsmResult GraphAlgorithms::SolveSalesmansProblem(const Graph& graph) {
+TsmResult GraphAlgorithms::SolveSalesmansProblem(const Graph& graph,
+                                                 int loops) {
   AntsLogic al_(graph);
-  return al_.SolveSalesmansProblem();
+  return al_.SolveSalesmansProblem(loops);
 }
 
-TsmResult GraphAlgorithms::SolveSalesmansProblemParallel(const Graph& graph) {
+TsmResult GraphAlgorithms::SolveSalesmansProblemParallel(const Graph& graph,
+                                                         int loops) {
   AntsLogic al_(graph);
-  return al_.SolveSalesmansProblemParallel();
+  return al_.SolveSalesmansProblemParallel(loops);
 }
 
 bool GraphAlgorithms::UndirectedCheck(const Graph& graph) {

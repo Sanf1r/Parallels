@@ -15,9 +15,9 @@ namespace s21 {
 
 class GraphAlgorithms {
  public:
-  TsmResult SolveSalesmansProblem(const Graph& graph);
+  TsmResult SolveSalesmansProblem(const Graph& graph, int loops);
 
-  TsmResult SolveSalesmansProblemParallel(const Graph& graph);
+  TsmResult SolveSalesmansProblemParallel(const Graph& graph, int loops);
 
   bool UndirectedCheck(const Graph& graph);
 

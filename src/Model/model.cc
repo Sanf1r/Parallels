@@ -2,12 +2,12 @@
 
 namespace s21 {
 
-TsmResult Model::SolveTravelingSalesmanProblem() {
-  return ga_.SolveSalesmansProblem(graph_);
+TsmResult Model::SolveTravelingSalesmanProblem(int loops) {
+  return ga_.SolveSalesmansProblem(graph_, loops);
 }
 
-TsmResult Model::SolveTravelingSalesmanProblemParallel() {
-  return ga_.SolveSalesmansProblemParallel(graph_);
+TsmResult Model::SolveTravelingSalesmanProblemParallel(int loops) {
+  return ga_.SolveSalesmansProblemParallel(graph_, loops);
 }
 
 bool Model::LoadGraphFromFile(const std::string& path) {

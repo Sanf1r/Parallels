@@ -10,12 +10,12 @@ class Controller {
   Controller() = delete;
   explicit Controller(Model* m) : model_(m){};
 
-  TsmResult SolveTravelingSalesmanProblem() {
-    return model_->SolveTravelingSalesmanProblem();
+  TsmResult SolveTravelingSalesmanProblem(int loops) {
+    return model_->SolveTravelingSalesmanProblem(loops);
   }
 
-  TsmResult SolveTravelingSalesmanProblemParallel() {
-    return model_->SolveTravelingSalesmanProblemParallel();
+  TsmResult SolveTravelingSalesmanProblemParallel(int loops) {
+    return model_->SolveTravelingSalesmanProblemParallel(loops);
   }
 
   bool LoadGraphFromFile(const std::string& path) {

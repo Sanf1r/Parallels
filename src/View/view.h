@@ -25,9 +25,7 @@ class View {
  private:
   Controller* c_;
 
-  bool Input(int* num_1, int* num_2);
-
-  bool Input(int* num_1);
+  bool Input(int* loops);
 
   bool Load();
 
@@ -44,8 +42,8 @@ class View {
   void Msp();
 
   bool TspIntro();
-  void Tsp();
-  void TspParallel();
+  void Tsp(int loops);
+  void TspParallel(int loops);
 };
 }  // namespace s21
 

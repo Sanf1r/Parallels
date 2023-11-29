@@ -71,7 +71,7 @@ void AntsLogic::CreateAntsParallel() {
   }
 
   for (auto &thread : threads) {
-    thread.join();
+    if (thread.joinable()) thread.join();
   }
 }
 
@@ -95,7 +95,7 @@ void AntsLogic::AntRunParallel() {
   }
 
   for (auto &thread : threads) {
-    thread.join();
+    if (thread.joinable()) thread.join();
   }
 }
 
@@ -158,7 +158,7 @@ void AntsLogic::BrainwashAntsParallel() {
   }
 
   for (auto &thread : threads) {
-    thread.join();
+    if (thread.joinable()) thread.join();
   }
 }
 

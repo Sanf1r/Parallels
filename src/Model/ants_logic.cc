@@ -56,7 +56,6 @@ TsmResult AntsLogic::SolveSalesmansProblemParallel(int loops) {
 
 void AntsLogic::CreateAnts() {
   ants_.reserve(graph_size_);
-
   for (int i = 0; i < graph_size_; ++i) {
     ants_.emplace_back(Ant(i));
   }
@@ -80,9 +79,9 @@ void AntsLogic::AntRun() {
 
 void AntsLogic::AntRunParallel() {
 #pragma omp parallel for schedule(dynamic)
-  for (int i = 0; i < graph_size_; ++i) {
-    while (ants_[i].GetMove()) {
-      ants_[i].AntMove(graph_, pheromone_, kAlpha_, kBeta_);
+  for (auto &ant : ants_) {
+    while (ant.GetMove()) {
+      ant.AntMove(graph_, pheromone_, kAlpha_, kBeta_);
     }
   }
 }
@@ -133,15 +132,15 @@ void AntsLogic::LocalUpdateParallel(TsmResult &path,
 }
 
 void AntsLogic::BrainwashAnts() {
-  for (int i = 0; i < graph_size_; ++i) {
-    ants_[i].BrainwashAnt();
+  for (auto &ant : ants_) {
+    ant.BrainwashAnt();
   }
 }
 
 void AntsLogic::BrainwashAntsParallel() {
 #pragma omp parallel for schedule(dynamic)
-  for (int i = 0; i < graph_size_; ++i) {
-    ants_[i].BrainwashAnt();
+  for (auto &ant : ants_) {
+    ant.BrainwashAnt();
   }
 }
 

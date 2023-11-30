@@ -158,7 +158,7 @@ void AntsLogic::UpdateGlobalPheromone(const AdjMatrix &lpu) {
 
 void AntsLogic::UpdateGlobalPheromoneParallel(const AdjMatrix &lpu) {
   int size = graph_.GetSize();
-#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for schedule(dynamic) collapse(2)
   for (int i = 0; i < size; ++i) {
     for (int j = 0; j < size; ++j) {
       if (i == j) continue;

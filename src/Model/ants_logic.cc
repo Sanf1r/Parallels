@@ -3,8 +3,8 @@
 namespace s21 {
 
 AntsLogic::AntsLogic(const Graph &graph) : graph_(graph) {
-  pheromone_.InitWithNumber(graph.GetSize(), 0.2);
   graph_size_ = graph_.GetSize();
+  pheromone_.InitWithNumber(graph_size_, 0.2);
 }
 
 TsmResult AntsLogic::SolveSalesmansProblem(int loops) {
@@ -64,14 +64,9 @@ void AntsLogic::CreateAnts() {
 
 void AntsLogic::CreateAntsParallel() {
   ants_.reserve(graph_size_);
-  std::vector<std::thread> threads;
-
-  for (int x = 0; x < graph_size_; x++) {
-    threads.emplace_back([&, x]() { ants_.emplace_back(Ant(x)); });
-  }
-
-  for (auto &thread : threads) {
-    if (thread.joinable()) thread.join();
+#pragma omp parallel for schedule(dynamic)
+  for (int i = 0; i < graph_size_; ++i) {
+    ants_.emplace_back(Ant(i));
   }
 }
 
@@ -84,18 +79,11 @@ void AntsLogic::AntRun() {
 }
 
 void AntsLogic::AntRunParallel() {
-  std::vector<std::thread> threads;
-
-  for (auto &ant : ants_) {
-    threads.emplace_back([&]() {
-      while (ant.GetMove()) {
-        ant.AntMove(graph_, pheromone_, kAlpha_, kBeta_);
-      }
-    });
-  }
-
-  for (auto &thread : threads) {
-    if (thread.joinable()) thread.join();
+#pragma omp parallel for schedule(dynamic)
+  for (int i = 0; i < graph_size_; ++i) {
+    while (ants_[i].GetMove()) {
+      ants_[i].AntMove(graph_, pheromone_, kAlpha_, kBeta_);
+    }
   }
 }
 
@@ -120,7 +108,7 @@ void AntsLogic::LocalUpdate(TsmResult &path,
 
 void AntsLogic::LocalUpdateParallel(TsmResult &path,
                                     AdjMatrix &local_pheromone_update) {
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
   for (int i = 0; i < graph_size_; ++i) {
     TsmResult ant_path = ants_[i].GetPath();
     if ((int)ant_path.vertices.size() == graph_size_ + 1) {
@@ -151,14 +139,9 @@ void AntsLogic::BrainwashAnts() {
 }
 
 void AntsLogic::BrainwashAntsParallel() {
-  std::vector<std::thread> threads;
-
-  for (auto &ant : ants_) {
-    threads.emplace_back([&]() { ant.BrainwashAnt(); });
-  }
-
-  for (auto &thread : threads) {
-    if (thread.joinable()) thread.join();
+#pragma omp parallel for schedule(dynamic)
+  for (int i = 0; i < graph_size_; ++i) {
+    ants_[i].BrainwashAnt();
   }
 }
 
@@ -175,7 +158,7 @@ void AntsLogic::UpdateGlobalPheromone(const AdjMatrix &lpu) {
 
 void AntsLogic::UpdateGlobalPheromoneParallel(const AdjMatrix &lpu) {
   int size = graph_.GetSize();
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
   for (int i = 0; i < size; ++i) {
     for (int j = 0; j < size; ++j) {
       if (i == j) continue;

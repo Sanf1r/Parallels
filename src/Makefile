@@ -1,5 +1,5 @@
-FLAGS=-Wall -Wextra -Werror -std=c++17 -pedantic
-FLAGSO3=-O3 -Wall -Wextra -Werror -std=c++17 -pedantic
+FLAGS=-Wall -Wextra -Werror -std=c++17 -pedantic -pthread -fopenmp
+FLAGSO3=-O3 -Wall -Wextra -Werror -std=c++17 -pedantic -pthread -fopenmp
 GTEST=-lgtest -lgtest_main -pthread
 COVER=-fprofile-arcs -ftest-coverage
 ASAN=#-fsanitize=address
@@ -11,7 +11,7 @@ all:  build
 build:
 	g++ $(FLAGSO3) $(ASAN) main.cc Model/model.cc Model/adj_matrix.cc Model/ant.cc \
 	Model/graph_algorithms.cc Model/ants_logic.cc ./Model/graph.cc View/view.cc \
-	-pthread -fopenmp -o SimpleNavigator
+	-o SimpleNavigator
 	rm -f *.a *.o
 
 .PHONY: debug

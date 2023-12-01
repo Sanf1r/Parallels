@@ -6,7 +6,7 @@ void Ant::AntMove(const Graph &graph, const AdjMatrix &pheromone_map, double a,
                   double b) {
   // start run
   if (path_.vertices.empty()) {
-    path_.vertices.push_back(current_location_);
+    path_.vertices.emplace_back(current_location_);
     visited_.insert(current_location_);
   }
 
@@ -17,8 +17,10 @@ void Ant::AntMove(const Graph &graph, const AdjMatrix &pheromone_map, double a,
   if (neighbor_vertexes.empty()) {
     can_move_ = false;
     if (graph(current_location_, start_location_) != INFINITY) {
-      path_.vertices.push_back(start_location_);
+      path_.vertices.emplace_back(start_location_);
       path_.distance += graph(current_location_, start_location_);
+      if ((int)path_.vertices.size() == graph.GetSize() + 1)
+        made_fool_run_ = true;
     }
     return;
   }
@@ -34,7 +36,7 @@ void Ant::AntMove(const Graph &graph, const AdjMatrix &pheromone_map, double a,
   next_vertex = neighbor_vertexes[index];
 
   // add, calculate and repeat
-  path_.vertices.push_back(next_vertex);
+  path_.vertices.emplace_back(next_vertex);
   path_.distance += graph(current_location_, next_vertex);
   visited_.insert(next_vertex);
   current_location_ = next_vertex;
@@ -47,9 +49,12 @@ void Ant::BrainwashAnt() {
   probability_.clear();
   current_location_ = start_location_;
   can_move_ = true;
+  made_fool_run_ = false;
 }
 
 bool Ant::GetMove() { return can_move_; }
+
+bool Ant::GetFullRun() { return made_fool_run_; }
 
 TsmResult &Ant::GetPath() { return path_; }
 
@@ -65,7 +70,7 @@ std::vector<int> Ant::getNeighborVertexes(const Graph &graph) {
   for (int to = 0; to < graph.GetSize(); ++to) {
     if (graph(current_location_, to) != INFINITY &&
         visited_.find(to) == visited_.end()) {
-      vertexes.push_back(to);
+      vertexes.emplace_back(to);
     }
   }
   return vertexes;
@@ -81,14 +86,14 @@ void Ant::MakeRoulette(const std::vector<int> &neighbor_vertexes,
   for (const auto &v : neighbor_vertexes) {
     double t = pheromone_map(current_location_, v);
     double n = std::pow(graph(current_location_, v), -1);
-    wish.push_back(std::pow(t, a) * std::pow(n, b));
+    wish.emplace_back(std::pow(t, a) * std::pow(n, b));
     summary_wish += wish.back();
   }
 
   // make roulette wheel
   int neighbor_size = neighbor_vertexes.size();
   for (int i = 0; i < neighbor_size; ++i) {
-    probability_.push_back(wish[i] / summary_wish);
+    probability_.emplace_back(wish[i] / summary_wish);
     if (i != 0) probability_[i] += probability_[i - 1];
   }
 }

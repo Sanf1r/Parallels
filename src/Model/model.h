@@ -1,5 +1,5 @@
-#ifndef A2_SIMPLENAVIGATOR_SRC_MODEL_MODEL_H_
-#define A2_SIMPLENAVIGATOR_SRC_MODEL_MODEL_H_
+#ifndef SRC_MODEL_MODEL_H_
+#define SRC_MODEL_MODEL_H_
 
 #include <algorithm>
 #include <cmath>
@@ -37,4 +37,4 @@ class Model {
 };
 }  // namespace s21
 
-#endif  //  A2_SIMPLENAVIGATOR_SRC_MODEL_MODEL_H_
+#endif  //  SRC_MODEL_MODEL_H_

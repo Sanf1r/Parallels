@@ -1,5 +1,5 @@
-#ifndef A2_SIMPLENAVIGATOR_SRC_MODEL_GRAPH_ALGORITHMS_H_
-#define A2_SIMPLENAVIGATOR_SRC_MODEL_GRAPH_ALGORITHMS_H_
+#ifndef SRC_MODEL_GRAPH_ALGORITHMS_H_
+#define SRC_MODEL_GRAPH_ALGORITHMS_H_
 
 #include <algorithm>
 #include <random>
@@ -8,8 +8,6 @@
 #include "ant.h"
 #include "ants_logic.h"
 #include "graph.h"
-#include "s21_queue.h"
-#include "s21_stack.h"
 
 namespace s21 {
 
@@ -27,4 +25,4 @@ class GraphAlgorithms {
 
 }  // namespace s21
 
-#endif  //  A2_SIMPLENAVIGATOR_SRC_MODEL_GRAPH_ALGORITHMS_H_
+#endif  //  SRC_MODEL_GRAPH_ALGORITHMS_H_

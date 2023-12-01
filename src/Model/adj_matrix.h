@@ -1,5 +1,5 @@
-#ifndef A2_SIMPLENAVIGATOR_SRC_MODEL_ADJ_MATRIX_H_
-#define A2_SIMPLENAVIGATOR_SRC_MODEL_ADJ_MATRIX_H_
+#ifndef SRC_MODEL_ADJ_MATRIX_H_
+#define SRC_MODEL_ADJ_MATRIX_H_
 
 #include <cmath>
 #include <iostream>
@@ -35,4 +35,4 @@ class AdjMatrix {
 };
 }  // namespace s21
 
-#endif  //  A2_SIMPLENAVIGATOR_SRC_MODEL_ADJ_MATRIX_H_
+#endif  //  SRC_MODEL_ADJ_MATRIX_H_

@@ -1,5 +1,5 @@
-#ifndef A2_SIMPLENAVIGATOR_SRC_VIEW_VIEW_H_
-#define A2_SIMPLENAVIGATOR_SRC_VIEW_VIEW_H_
+#ifndef SRC_VIEW_VIEW_H_
+#define SRC_VIEW_VIEW_H_
 
 #include <chrono>
 #include <cmath>
@@ -47,4 +47,4 @@ class View {
 };
 }  // namespace s21
 
-#endif  //  A2_SIMPLENAVIGATOR_SRC_VIEW_VIEW_H_
+#endif  //  SRC_VIEW_VIEW_H_

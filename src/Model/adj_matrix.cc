@@ -12,7 +12,7 @@ void AdjMatrix::InitWithNumber(int size, double num) {
   offset_ = size;
 }
 
-void AdjMatrix::Push(double num) { data_.push_back(num); }
+void AdjMatrix::Push(double num) { data_.emplace_back(num); }
 
 void AdjMatrix::Print() {
   int c = 1;

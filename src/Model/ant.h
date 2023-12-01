@@ -1,5 +1,5 @@
-#ifndef A2_SIMPLENAVIGATOR_SRC_MODEL_ANT_H_
-#define A2_SIMPLENAVIGATOR_SRC_MODEL_ANT_H_
+#ifndef SRC_MODEL_ANT_H_
+#define SRC_MODEL_ANT_H_
 
 #include <random>
 #include <set>
@@ -19,6 +19,7 @@ class Ant {
 
   void BrainwashAnt();
   bool GetMove();
+  bool GetFullRun();
   TsmResult &GetPath();
   int GetStart() { return start_location_; }  // debug
 
@@ -29,6 +30,7 @@ class Ant {
   std::vector<double> probability_;
   int start_location_ = 0, current_location_ = 0;
   bool can_move_ = true;
+  bool made_fool_run_ = false;
 
   double getRandomChoice();
   std::vector<int> getNeighborVertexes(const Graph &graph);
@@ -38,4 +40,4 @@ class Ant {
 };
 }  // namespace s21
 
-#endif  //  A2_SIMPLENAVIGATOR_SRC_MODEL_ANT_H_
+#endif  //  SRC_MODEL_ANT_H_

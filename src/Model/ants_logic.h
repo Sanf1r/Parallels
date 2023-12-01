@@ -1,5 +1,5 @@
-#ifndef A2_SIMPLENAVIGATOR_SRC_MODEL_ANTS_LOGIC_H_
-#define A2_SIMPLENAVIGATOR_SRC_MODEL_ANTS_LOGIC_H_
+#ifndef SRC_MODEL_ANTS_LOGIC_H_
+#define SRC_MODEL_ANTS_LOGIC_H_
 
 #include <algorithm>
 #include <execution>
@@ -37,8 +37,11 @@ class AntsLogic {
   void AntRun();
   void AntRunParallel();
 
-  void LocalUpdate(TsmResult &path, AdjMatrix &local_pheromone_update);
-  void LocalUpdateParallel(TsmResult &path, AdjMatrix &local_pheromone_update);
+  void ComparePath(TsmResult &path);
+  void ComparePathParallel(TsmResult &path);
+
+  void LocalUpdate(AdjMatrix &local_pheromone_update);
+  void LocalUpdateParallel(AdjMatrix &local_pheromone_update);
 
   void BrainwashAnts();
   void BrainwashAntsParallel();
@@ -48,4 +51,4 @@ class AntsLogic {
 };
 }  // namespace s21
 
-#endif  //  A2_SIMPLENAVIGATOR_SRC_MODEL_ANTS_LOGIC_H_
+#endif  //  SRC_MODEL_ANTS_LOGIC_H_

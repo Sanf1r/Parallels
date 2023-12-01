@@ -1,5 +1,5 @@
-#ifndef A2_SIMPLENAVIGATOR_SRC_MODEL_GRAPH_H_
-#define A2_SIMPLENAVIGATOR_SRC_MODEL_GRAPH_H_
+#ifndef SRC_MODEL_GRAPH_H_
+#define SRC_MODEL_GRAPH_H_
 
 #include <cmath>
 #include <fstream>
@@ -41,4 +41,4 @@ struct TsmResult {
 };
 }  // namespace s21
 
-#endif  //  A2_SIMPLENAVIGATOR_SRC_MODEL_GRAPH_H_
+#endif  //  SRC_MODEL_GRAPH_H_

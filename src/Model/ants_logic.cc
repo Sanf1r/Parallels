@@ -21,7 +21,8 @@ TsmResult AntsLogic::SolveSalesmansProblem(int loops) {
     // ant runs while he still can
     AntRun();
     // compare ant result to best
-    LocalUpdate(path, local_pheromone_update);
+    ComparePath(path);
+    LocalUpdate(local_pheromone_update);
 
     UpdateGlobalPheromone(local_pheromone_update);
     BrainwashAnts();
@@ -45,7 +46,8 @@ TsmResult AntsLogic::SolveSalesmansProblemParallel(int loops) {
     // ant runs while he still can
     AntRunParallel();
     // compare ant result to best
-    LocalUpdateParallel(path, local_pheromone_update);
+    ComparePathParallel(path);
+    LocalUpdateParallel(local_pheromone_update);
 
     UpdateGlobalPheromoneParallel(local_pheromone_update);
     BrainwashAntsParallel();
@@ -86,45 +88,59 @@ void AntsLogic::AntRunParallel() {
   }
 }
 
-void AntsLogic::LocalUpdate(TsmResult &path,
-                            AdjMatrix &local_pheromone_update) {
+void AntsLogic::ComparePath(TsmResult &path) {
   for (auto &ant : ants_) {
     TsmResult ant_path = ant.GetPath();
     if ((int)ant_path.vertices.size() == graph_size_ + 1) {
       if (ant.GetPath().distance < path.distance) {
-        path = std::move(ant.GetPath());
+        path = ant_path;
         // *counter = 0; // if we need find best route
-      }
-      // calculate pheromone delta for every edge
-      double pheromone_delta = kQ_ / ant_path.distance;
-      for (int i = 0; i < graph_size_; ++i) {
-        local_pheromone_update(ant_path.vertices[i],
-                               ant_path.vertices[i + 1]) += pheromone_delta;
       }
     }
   }
 }
 
-void AntsLogic::LocalUpdateParallel(TsmResult &path,
-                                    AdjMatrix &local_pheromone_update) {
+void AntsLogic::ComparePathParallel(TsmResult &path) {
 #pragma omp parallel for schedule(dynamic)
-  for (int i = 0; i < graph_size_; ++i) {
-    TsmResult ant_path = ants_[i].GetPath();
-    if ((int)ant_path.vertices.size() == graph_size_ + 1) {
-      if (ant_path.distance < path.distance) {
+  for (auto &ant : ants_) {
+    if (ant.GetFullRun()) {
+      if (ant.GetPath().distance < path.distance) {
 #pragma omp critical
         {
-          path = ant_path;
+          path = ant.GetPath();
           // *counter = 0; // if we need find best route
         }
       }
+    }
+  }
+}
+
+void AntsLogic::LocalUpdate(AdjMatrix &local_pheromone_update) {
+  for (auto &ant : ants_) {
+    if (ant.GetFullRun()) {
       // calculate pheromone delta for every edge
-      double pheromone_delta = kQ_ / ant_path.distance;
+      double pheromone_delta = kQ_ / ant.GetPath().distance;
+      for (int i = 0; i < graph_size_; ++i) {
+        local_pheromone_update(ant.GetPath().vertices[i],
+                               ant.GetPath().vertices[i + 1]) +=
+            pheromone_delta;
+      }
+    }
+  }
+}
+
+void AntsLogic::LocalUpdateParallel(AdjMatrix &local_pheromone_update) {
+#pragma omp parallel for schedule(dynamic)
+  for (auto &ant : ants_) {
+    if (ant.GetFullRun()) {
+      // calculate pheromone delta for every edge
+      double pheromone_delta = kQ_ / ant.GetPath().distance;
 #pragma omp critical
       {
         for (int j = 0; j < graph_size_; ++j) {
-          local_pheromone_update(ant_path.vertices[j],
-                                 ant_path.vertices[j + 1]) += pheromone_delta;
+          local_pheromone_update(ant.GetPath().vertices[j],
+                                 ant.GetPath().vertices[j + 1]) +=
+              pheromone_delta;
         }
       }
     }

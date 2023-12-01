@@ -31,16 +31,6 @@ class View {
 
   bool LoadCheck(bool flag);
 
-  void Bfs();
-
-  void Dfs();
-
-  void Dijkstra();
-
-  void FloWa();
-
-  void Msp();
-
   bool TspIntro();
   void Tsp(int loops);
   void TspParallel(int loops);

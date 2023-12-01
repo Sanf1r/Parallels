@@ -21,6 +21,12 @@ debug:
 	-pthread -fopenmp -o SimpleNavigator
 	rm -f *.a *.o
 
+.PHONY: winograd
+winograd:
+	g++ -g $(FLAGSO3) Model/winograd.cc \
+    -pthread -fopenmp -o winograd
+	rm -f *.a *.o
+
 .PHONY: clean
 clean:
 	rm -f SimpleNavigator

@@ -18,13 +18,13 @@ build:
 debug:
 	g++ -g $(FLAGS) main.cc Model/model.cc Model/adj_matrix.cc Model/ant.cc \
 	Model/graph_algorithms.cc Model/ants_logic.cc ./Model/graph.cc View/view.cc \
-	-pthread -fopenmp -o SimpleNavigator
+	-o SimpleNavigator
 	rm -f *.a *.o
 
 .PHONY: winograd
 winograd:
 	g++ -g $(FLAGSO3) Model/winograd.cc \
-    -pthread -fopenmp -o winograd
+    -o winograd
 	rm -f *.a *.o
 
 .PHONY: clean

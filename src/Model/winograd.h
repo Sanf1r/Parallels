@@ -14,6 +14,8 @@
 #include <thread>
 #include <vector>
 
+#include "thread_queue.h"
+
 class Winograd {
  public:
   Winograd(std::vector<std::vector<double>>& in_1,
@@ -61,8 +63,9 @@ class Winograd {
     std::vector<double> result(col_two);
 #pragma omp parallel for schedule(dynamic)
     for (int col = 0; col < col_two; ++col) {
-      for (int j = 0; j < half_; ++j)
+      for (int j = 0; j < half_; ++j) {
         result[col] += in_2_[2 * j][col] * in_2_[2 * j + 1][col];
+      }
     }
     return result;
   }
@@ -195,91 +198,71 @@ class Winograd {
     std::vector<std::vector<double>> result_matrix(row_one);
     for (auto& row : result_matrix) row.resize(col_two);
 
-    std::queue<double> row_q;
-    std::queue<double> mult_q;
+    // std::queue<double> row_q;
+    // std::queue<double> mult_q;
 
-    bool t1_done = false;
-    bool t2_done = false;
-    bool t3_done = false;
+    TSQueue<double> row_q;
+    TSQueue<double> mult_q;
+    TSQueue<char> t4_q;
 
+    // bool t1_done = false;
+    // bool t2_done = false;
+    // std::queue<bool> t1_done_q;
+    // std::queue<bool> t2_done_q;
+    // std::queue<bool> t3_done_q;
+
+    int stop = row_one * col_two;
     auto col_factor = ColFactorParallel();
 
     std::thread t1([&]() {
-      std::unique_lock<std::mutex> lock(gLock);
-
       for (int row = 0; row < row_one; ++row) {
         double result = 0;
         for (int j = 0; j < half_; ++j) {
           result += in_1_[row][2 * j] * in_1_[row][2 * j + 1];
         }
-        row_q.emplace(result);
-        t1_done = true;
-        gConVar.notify_one();
+        row_q.push(result);
       }
     });
 
-    int stop = row_one * col_two;
-
     std::thread t2([&]() {
-      std::unique_lock<std::mutex> lock(gLock);
-      int c = 0, col = 0;
+      int c = 0;
       while (c != stop) {
-        while (!t1_done) {
-          gConVar.wait(lock);
-        }
-        mult_q.emplace(-row_q.front() - col_factor[col++]);
-        t2_done = true;
-        gConVar_2.notify_one();
-        c++;
-        if (c % col_two == 0) {
-          row_q.pop();
-          col = 0;
+        double num = row_q.pop();
+        for (int col = 0; col < col_two; ++col) {
+          mult_q.push(-num - col_factor[col]);
+          c++;
         }
       }
     });
 
     std::thread t3([&]() {
-      std::unique_lock<std::mutex> lock(gLock);
-      int c = 0, ro = 0, co = 0;
-      while (c != stop) {
-        while (!t2_done) {
-          gConVar_2.wait(lock);
+      for (int row = 0; row < row_one; ++row) {
+        for (int col = 0; col < col_two; ++col) {
+          result_matrix[row][col] = mult_q.pop();
+          for (auto k = 0; k < half_; ++k) {
+            result_matrix[row][col] +=
+                (in_1_[row][2 * k] + in_2_[2 * k + 1][col]) *
+                (in_1_[row][2 * k + 1] + in_2_[2 * k][col]);
+            t4_q.push('1');
+          }
         }
-        result_matrix[ro][co] = mult_q.front();
-        for (auto k = 0; k < half_; ++k) {
-          result_matrix[ro][co] += (in_1_[ro][2 * k] + in_2_[2 * k + 1][co]) *
-                                   (in_1_[ro][2 * k + 1] + in_2_[2 * k][co]);
-        }
-        t3_done = true;
-        gConVar_3.notify_one();
-        co++;
-        if (co == col_two) {
-          co = 0;
-          ro++;
-        };
-        c++;
-        mult_q.pop();
       }
     });
 
     std::thread t4([&]() {
-      std::unique_lock<std::mutex> lock(gLock);
       int c = 0, ro = 0, co = 0;
       if (even_) c = stop;
       while (c != stop) {
-        while (!t3_done) {
-          gConVar_3.wait(lock);
+        while (t4_q.pop()) {
+          result_matrix[ro][co] +=
+              in_1_[ro][row_two - 1] * in_2_[row_two - 1][co];
+          co++;
+          if (co == col_two) {
+            ro++;
+            co = 0;
+          }
+          c++;
         }
-
-        result_matrix[ro][co] +=
-            in_1_[ro][row_two - 1] * in_2_[row_two - 1][co];
-        co++;
-
-        if (co == col_two) {
-          ro++;
-          co = 0;
-        }
-        c++;
       }
     });
 

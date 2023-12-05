@@ -3,7 +3,7 @@
 void Load(std::vector<std::vector<double>> &matrix, const std::string &path) {
   std::ifstream in(path);
   std::string temp;
-  int x;
+  double x;
   int c = 0;
 
   while (getline(in, temp)) {
@@ -17,13 +17,15 @@ void Load(std::vector<std::vector<double>> &matrix, const std::string &path) {
 
 int main() {
   std::vector<std::vector<double>> one;
-  one.resize(500);
+  one.resize(2000);
   std::vector<std::vector<double>> two;
-  two.resize(500);
+  two.resize(2000);
   // std::string file = "/Users/morfinov/GHPara/src/Model/test.txt";
   // std::string file_2 = "/Users/morfinov/GHPara/src/Model/test2.txt";
-  std::string file = "/Users/morfinov/GHPara/src/Model/file_500.txt";
-  std::string file_2 = "/Users/morfinov/GHPara/src/Model/file_500.txt";
+  // std::string file = "/Users/morfinov/GHPara/src/Model/file_500.txt";
+  // std::string file_2 = "/Users/morfinov/GHPara/src/Model/file_500.txt";
+  std::string file = "/Users/morfinov/GHPara/src/Model/1000x1000.txt";
+  std::string file_2 = "/Users/morfinov/GHPara/src/Model/1000x1000.txt";
   Load(one, file);
   Load(two, file_2);
   std::cout << "LOAD DONE" << std::endl;
@@ -31,7 +33,7 @@ int main() {
   // Winograd st(one, two);
   // int c = 0;
   // auto t1 = std::chrono::high_resolution_clock::now();
-  // while (c++ < 10) {
+  // while (c++ < 1) {
   //   auto res = st.Standart();
   // }
   // auto t2 = std::chrono::high_resolution_clock::now();
@@ -46,10 +48,28 @@ int main() {
   //   std::cout << std::endl;
   // }
 
+  // Winograd par(one, two);
+  // int z = 0;
+  // auto t5 = std::chrono::high_resolution_clock::now();
+  // while (z++ < 1) {
+  //   auto res_par = par.Parallel();
+  // }
+  // auto t6 = std::chrono::high_resolution_clock::now();
+  // auto total_3 =
+  //     std::chrono::duration_cast<std::chrono::seconds>(t6 - t5).count();
+  // std::cout << "seq time - " << total_3 << std::endl;
+
+  // for (auto &r : res_par) {
+  //   for (auto &print : r) {
+  //     std::cout << print << " ";
+  //   }
+  //   std::cout << std::endl;
+  // }
+
   Winograd pipe(one, two);
   int t = 0;
   auto t3 = std::chrono::high_resolution_clock::now();
-  while (t++ < 10) {
+  while (t++ < 1) {
     auto res_pipe = pipe.Pipeline();
   }
   auto t4 = std::chrono::high_resolution_clock::now();

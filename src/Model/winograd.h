@@ -59,17 +59,6 @@ class Winograd {
     return result;
   }
 
-  std::vector<double> ColFactorParallel() {
-    std::vector<double> result(col_two);
-#pragma omp parallel for schedule(dynamic)
-    for (int col = 0; col < col_two; ++col) {
-      for (int j = 0; j < half_; ++j) {
-        result[col] += in_2_[2 * j][col] * in_2_[2 * j + 1][col];
-      }
-    }
-    return result;
-  }
-
   std::vector<std::vector<double>> WinogradMulti(std::vector<double>& row_f,
                                                  std::vector<double>& col_f) {
     std::vector<std::vector<double>> result(row_one);
@@ -89,6 +78,64 @@ class Winograd {
   }
 
   void IfNotEven(std::vector<std::vector<double>>& result) {
+    for (int row = 0; row < row_one; ++row)
+      for (int col = 0; col < col_two; ++col)
+        result[row][col] += in_1_[row][row_two - 1] * in_2_[row_two - 1][col];
+  }
+
+  std::vector<std::vector<double>> Parallel() {
+    auto row_f = RowFactorParallel();
+
+    auto col_f = ColFactorParallel();
+
+    auto res = WinogradMultiParallel(row_f, col_f);
+
+    if (!even_) IfNotEvenParallel(res);
+
+    return res;
+  }
+
+  std::vector<double> RowFactorParallel() {
+    std::vector<double> result(row_one);
+#pragma omp parallel for schedule(dynamic)
+    for (int row = 0; row < row_one; ++row) {
+      for (int j = 0; j < half_; ++j)
+        result[row] += in_1_[row][2 * j] * in_1_[row][2 * j + 1];
+    }
+    return result;
+  }
+
+  std::vector<double> ColFactorParallel() {
+    std::vector<double> result(col_two);
+#pragma omp parallel for schedule(dynamic)
+    for (int col = 0; col < col_two; ++col) {
+      for (int j = 0; j < half_; ++j) {
+        result[col] += in_2_[2 * j][col] * in_2_[2 * j + 1][col];
+      }
+    }
+    return result;
+  }
+
+  std::vector<std::vector<double>> WinogradMultiParallel(
+      std::vector<double>& row_f, std::vector<double>& col_f) {
+    std::vector<std::vector<double>> result(row_one);
+    for (auto& row : result) row.resize(col_two);
+#pragma omp parallel for schedule(dynamic) collapse(2)
+    for (int row = 0; row < row_one; ++row) {
+      for (int col = 0; col < col_two; ++col) {
+        result[row][col] = -row_f[row] - col_f[col];
+        for (auto k = 0; k < half_; ++k) {
+          result[row][col] += (in_1_[row][2 * k] + in_2_[2 * k + 1][col]) *
+                              (in_1_[row][2 * k + 1] + in_2_[2 * k][col]);
+        }
+      }
+    }
+
+    return result;
+  }
+
+  void IfNotEvenParallel(std::vector<std::vector<double>>& result) {
+#pragma omp parallel for schedule(dynamic) collapse(2)
     for (int row = 0; row < row_one; ++row)
       for (int col = 0; col < col_two; ++col)
         result[row][col] += in_1_[row][row_two - 1] * in_2_[row_two - 1][col];
@@ -201,9 +248,9 @@ class Winograd {
     // std::queue<double> row_q;
     // std::queue<double> mult_q;
 
-    TSQueue<double> row_q;
-    TSQueue<int> mult_q;
-    TSQueue<int> t4_q;
+    TSQueue<double> t1_q;
+    TSQueue<double> t2_q;
+    TSQueue<int> t3_q;
 
     // bool t1_done = false;
     // bool t2_done = false;
@@ -211,56 +258,66 @@ class Winograd {
     // std::queue<bool> t2_done_q;
     // std::queue<bool> t3_done_q;
 
-    auto col_factor = ColFactorParallel();
+    // auto col_factor = ColFactorParallel();
 
     std::thread t1([&]() {
+      std::cout << "T1 START" << std::endl;
+      for (int col = 0; col < col_two; ++col) {
+        double result = 0;
+        for (int j = 0; j < half_; ++j) {
+          result += in_2_[2 * j][col] * in_2_[2 * j + 1][col];
+          t1_q.push(result);
+        }
+      }
+      std::cout << "T1 END" << std::endl;
+    });
+
+    std::thread t2([&]() {
+      std::cout << "T2 START" << std::endl;
       for (int row = 0; row < row_one; ++row) {
         double result = 0;
         for (int j = 0; j < half_; ++j) {
           result += in_1_[row][2 * j] * in_1_[row][2 * j + 1];
         }
-        row_q.push(result);
+        t2_q.push(result);
       }
-    });
-
-    std::thread t2([&]() {
-      for (int row = 0; row < row_one; ++row) {
-        double num = row_q.pop();
-        for (int col = 0; col < col_two; ++col) {
-          result_matrix[row][col] = -num - col_factor[col];
-          mult_q.push(1);
-        }
-      }
+      std::cout << "T2 END" << std::endl;
     });
 
     std::thread t3([&]() {
+      std::cout << "T3 START" << std::endl;
       for (int row = 0; row < row_one; ++row) {
         for (int col = 0; col < col_two; ++col) {
-          result_matrix[row][col] = mult_q.pop();
           for (auto k = 0; k < half_; ++k) {
             result_matrix[row][col] +=
                 (in_1_[row][2 * k] + in_2_[2 * k + 1][col]) *
                 (in_1_[row][2 * k + 1] + in_2_[2 * k][col]);
-            t4_q.push(1);
           }
         }
+        t3_q.push(1);
       }
+      std::cout << "T3 END" << std::endl;
     });
 
     std::thread t4([&]() {
-      if (even_) return;
-      for (int row = 0; row < row_one; ++row)
+      std::cout << "T4 START" << std::endl;
+      for (int row = 0; row < row_one; ++row) {
+        double col_f = t1_q.pop();
+        double row_f = t2_q.pop();
+        t3_q.pop();
         for (int col = 0; col < col_two; ++col) {
-          t4_q.pop();
-          result_matrix[row][col] +=
-              in_1_[row][row_two - 1] * in_2_[row_two - 1][col];
+          result_matrix[row][col] = -row_f - col_f;
         }
+      }
+      std::cout << "T4 END" << std::endl;
     });
 
     if (t1.joinable()) t1.join();
     if (t2.joinable()) t2.join();
     if (t3.joinable()) t3.join();
     if (t4.joinable()) t4.join();
+
+    if (even_) IfNotEvenParallel(result_matrix);
     return result_matrix;
   }
 

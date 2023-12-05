@@ -202,8 +202,8 @@ class Winograd {
     // std::queue<double> mult_q;
 
     TSQueue<double> row_q;
-    TSQueue<double> mult_q;
-    TSQueue<char> t4_q;
+    TSQueue<int> mult_q;
+    TSQueue<int> t4_q;
 
     // bool t1_done = false;
     // bool t2_done = false;
@@ -211,7 +211,6 @@ class Winograd {
     // std::queue<bool> t2_done_q;
     // std::queue<bool> t3_done_q;
 
-    int stop = row_one * col_two;
     auto col_factor = ColFactorParallel();
 
     std::thread t1([&]() {
@@ -225,12 +224,11 @@ class Winograd {
     });
 
     std::thread t2([&]() {
-      int c = 0;
-      while (c != stop) {
+      for (int row = 0; row < row_one; ++row) {
         double num = row_q.pop();
         for (int col = 0; col < col_two; ++col) {
-          mult_q.push(-num - col_factor[col]);
-          c++;
+          result_matrix[row][col] = -num - col_factor[col];
+          mult_q.push(1);
         }
       }
     });
@@ -243,27 +241,20 @@ class Winograd {
             result_matrix[row][col] +=
                 (in_1_[row][2 * k] + in_2_[2 * k + 1][col]) *
                 (in_1_[row][2 * k + 1] + in_2_[2 * k][col]);
-            t4_q.push('1');
+            t4_q.push(1);
           }
         }
       }
     });
 
     std::thread t4([&]() {
-      int c = 0, ro = 0, co = 0;
-      if (even_) c = stop;
-      while (c != stop) {
-        while (t4_q.pop()) {
-          result_matrix[ro][co] +=
-              in_1_[ro][row_two - 1] * in_2_[row_two - 1][co];
-          co++;
-          if (co == col_two) {
-            ro++;
-            co = 0;
-          }
-          c++;
+      if (even_) return;
+      for (int row = 0; row < row_one; ++row)
+        for (int col = 0; col < col_two; ++col) {
+          t4_q.pop();
+          result_matrix[row][col] +=
+              in_1_[row][row_two - 1] * in_2_[row_two - 1][col];
         }
-      }
     });
 
     if (t1.joinable()) t1.join();

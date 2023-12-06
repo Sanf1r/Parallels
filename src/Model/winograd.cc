@@ -24,8 +24,8 @@ int main() {
   // std::string file_2 = "/Users/morfinov/GHPara/src/Model/test2.txt";
   // std::string file = "/Users/morfinov/GHPara/src/Model/file_500.txt";
   // std::string file_2 = "/Users/morfinov/GHPara/src/Model/file_500.txt";
-  std::string file = "/Users/morfinov/GHPara/src/Model/1000x1000.txt";
-  std::string file_2 = "/Users/morfinov/GHPara/src/Model/1000x1000.txt";
+  std::string file = "/Users/morfinov/Parallels/src/Model/1000x1000.txt";
+  std::string file_2 = "/Users/morfinov/Parallels/src/Model/1000x1000.txt";
   Load(one, file);
   Load(two, file_2);
   std::cout << "LOAD DONE" << std::endl;

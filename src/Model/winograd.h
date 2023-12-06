@@ -258,15 +258,16 @@ class Winograd {
     // std::queue<bool> t2_done_q;
     // std::queue<bool> t3_done_q;
 
-    // auto col_factor = ColFactorParallel();
+    auto col_factor = ColFactorParallel();
+    auto row_factor = RowFactorParallel();
 
     std::thread t1([&]() {
       std::cout << "T1 START" << std::endl;
-      for (int col = 0; col < col_two; ++col) {
-        double result = 0;
-        for (int j = 0; j < half_; ++j) {
-          result += in_2_[2 * j][col] * in_2_[2 * j + 1][col];
-          t1_q.push(result);
+      for (int row = 0; row < row_one; ++row) {
+        for (int col = 0; col < col_two; ++col) {
+          for (auto k = 0; k < half_; ++k) {
+            t1_q.push(in_1_[row][2 * k] + in_2_[2 * k + 1][col]);
+          }
         }
       }
       std::cout << "T1 END" << std::endl;
@@ -275,11 +276,11 @@ class Winograd {
     std::thread t2([&]() {
       std::cout << "T2 START" << std::endl;
       for (int row = 0; row < row_one; ++row) {
-        double result = 0;
-        for (int j = 0; j < half_; ++j) {
-          result += in_1_[row][2 * j] * in_1_[row][2 * j + 1];
+        for (int col = 0; col < col_two; ++col) {
+          for (auto k = 0; k < half_; ++k) {
+            t2_q.push(in_1_[row][2 * k + 1] + in_2_[2 * k][col]);
+          }
         }
-        t2_q.push(result);
       }
       std::cout << "T2 END" << std::endl;
     });
@@ -288,13 +289,13 @@ class Winograd {
       std::cout << "T3 START" << std::endl;
       for (int row = 0; row < row_one; ++row) {
         for (int col = 0; col < col_two; ++col) {
-          for (auto k = 0; k < half_; ++k) {
-            result_matrix[row][col] +=
-                (in_1_[row][2 * k] + in_2_[2 * k + 1][col]) *
-                (in_1_[row][2 * k + 1] + in_2_[2 * k][col]);
+          for (auto k = 0; k < row_one * col_two * half_; ++k) {
+            double left = t1_q.pop();
+            double right = t2_q.pop();
+            result_matrix[row][col] += left * right;
           }
+          t3_q.push(1);
         }
-        t3_q.push(1);
       }
       std::cout << "T3 END" << std::endl;
     });
@@ -302,11 +303,9 @@ class Winograd {
     std::thread t4([&]() {
       std::cout << "T4 START" << std::endl;
       for (int row = 0; row < row_one; ++row) {
-        double col_f = t1_q.pop();
-        double row_f = t2_q.pop();
-        t3_q.pop();
         for (int col = 0; col < col_two; ++col) {
-          result_matrix[row][col] = -row_f - col_f;
+          t3_q.pop();
+          result_matrix[row][col] = -row_factor[row] - col_factor[col];
         }
       }
       std::cout << "T4 END" << std::endl;

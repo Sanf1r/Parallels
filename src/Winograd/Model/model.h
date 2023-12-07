@@ -14,6 +14,7 @@
 #include <thread>
 #include <vector>
 
+#include "matrix.h"
 #include "tsqueue.h"
 
 namespace s21 {
@@ -30,9 +31,13 @@ class Model {
   void Parallel(int loops);
   void Pipeline(int loops);
 
+  void PrintStandartRes() { standart_result_.Print(); }
+  void PrintParallelRes() { parallel_result_.Print(); }
+  void PrintPipelineRes() { pipeline_result_.Print(); }
+
  private:
-  std::vector<std::vector<double>> in_1_;
-  std::vector<std::vector<double>> in_2_;
+  Matrix in_1_;
+  Matrix in_2_;
   int row_one = 0;
   int col_one = 0;
   int row_two = 0;
@@ -40,26 +45,22 @@ class Model {
   int half_ = 0;
   bool even_ = false;
 
-  std::vector<std::vector<double>> standart_result_;
-  std::vector<std::vector<double>> parallel_result_;
-  std::vector<std::vector<double>> pipeline_result_;
+  Matrix standart_result_;
+  Matrix parallel_result_;
+  Matrix pipeline_result_;
 
-  bool LoadLogicFirst(const std::string& f_path,
-                      std::vector<std::vector<double>>& matrix);
-  bool LoadLogicSecond(const std::string& s_path,
-                       std::vector<std::vector<double>>& matrix);
+  bool LoadLogic(const std::string& path, Matrix& matrix);
 
   std::vector<double> RowFactor();
   std::vector<double> ColFactor();
-  std::vector<std::vector<double>> WinogradMulti(std::vector<double>& row_f,
-                                                 std::vector<double>& col_f);
-  void IfNotEven(std::vector<std::vector<double>>& result);
+  void WinogradMulti(std::vector<double>& row_f, std::vector<double>& col_f);
+  void IfNotEven();
 
   std::vector<double> RowFactorParallel();
   std::vector<double> ColFactorParallel();
-  std::vector<std::vector<double>> WinogradMultiParallel(
-      std::vector<double>& row_f, std::vector<double>& col_f);
-  void IfNotEvenParallel(std::vector<std::vector<double>>& result);
+  void WinogradMultiParallel(std::vector<double>& row_f,
+                             std::vector<double>& col_f);
+  void IfNotEvenParallel();
 };
 
 }  // namespace s21

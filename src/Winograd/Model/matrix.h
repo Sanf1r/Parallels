@@ -17,6 +17,12 @@ class Matrix {
     return matrix_[row * cols_ + columns];
   }
 
+  void Clear() { matrix_.clear(); }
+
+  void Reserve() { matrix_.reserve(rows_ * cols_); }
+
+  void Push(double num) { matrix_.emplace_back(num); }
+
   void Print() {
     int c = 1;
     for (int i = 0; i < rows_ * cols_; ++i) {

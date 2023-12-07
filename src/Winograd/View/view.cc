@@ -31,8 +31,11 @@ void View::StartEventLoop() {
         if (WinIntro() && Input(&loops)) {
           c_->BeforeCalculation(4);
           WinStandart(loops);
+          c_->PrintStandartRes();
           WinParallel(loops);
+          c_->PrintParallelRes();
           WinPipeline(loops);
+          c_->PrintPipelineRes();
         }
         break;
 

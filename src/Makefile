@@ -23,8 +23,8 @@ debug:
 
 .PHONY: winograd
 winograd:
-	g++ -g $(FLAGSO3) Model/winograd.cc \
-    -o winograd
+	g++ -g $(FLAGSO3) Winograd/Model/winograd.cc \
+    -o WinogradAlgo
 	rm -f *.a *.o
 
 .PHONY: clean

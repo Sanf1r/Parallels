@@ -10,21 +10,15 @@ class Controller {
   Controller() = delete;
   explicit Controller(Model* m) : model_(m){};
 
-  TsmResult SolveTravelingSalesmanProblem(int loops) {
-    return model_->SolveTravelingSalesmanProblem(loops);
+  void BeforeCalculation(int thread_num) { model_->BeforeCalculation(thread_num); }
+
+  void Standart(int loops) { model_->Standart(loops); }
+  void Parallel(int loops) { model_->Parallel(loops); }
+  void Pipeline(int loops) { model_->Pipeline(loops); }
+
+  bool LoadMatrix(const std::string& f_path, const std::string& s_path) {
+    return model_->LoadMatrix(f_path, s_path);
   }
-
-  TsmResult SolveTravelingSalesmanProblemParallel(int loops) {
-    return model_->SolveTravelingSalesmanProblemParallel(loops);
-  }
-
-  bool LoadGraphFromFile(const std::string& path) {
-    return model_->LoadGraphFromFile(path);
-  }
-
-  bool UndirectedCheck() { return model_->UndirectedCheck(); }
-
-  int GetSize() { return model_->GetSize(); }
 
  private:
   Model* model_;

@@ -23,7 +23,7 @@ debug:
 
 .PHONY: winograd
 winograd:
-	g++ -g $(FLAGSO3) Winograd/Model/winograd.cc \
+	g++ $(FLAGSO3) Winograd/main.cc Winograd/Model/model.cc Winograd/View/view.cc \
     -o WinogradAlgo
 	rm -f *.a *.o
 

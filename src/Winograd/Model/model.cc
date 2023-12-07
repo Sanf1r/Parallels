@@ -2,34 +2,36 @@
 
 namespace s21 {
 
-Model::Model(std::vector<std::vector<double>>& in_1,
-             std::vector<std::vector<double>>& in_2)
-    : in_1_(in_1), in_2_(in_2) {
-  row_one = in_1_.size();
-  col_one = in_1_[0].size();
-  row_two = in_2_.size();
-  col_two = in_2_[0].size();
+void Model::BeforeCalculation(int thread_num) {
+  omp_set_num_threads(thread_num);
   if (row_two % 2 == 0) even_ = true;
   half_ = row_two / 2;
+  standart_result_.clear();
+  parallel_result_.clear();
+  pipeline_result_.clear();
 }
 
-std::vector<std::vector<double>> Model::Standart() {
-  auto row_f = RowFactor();
+void Model::Standart(int loops) {
+  int counter = 0;
+  while (counter++ < loops) {
+    auto row_f = RowFactor();
 
-  auto col_f = ColFactor();
+    auto col_f = ColFactor();
 
-  auto res = WinogradMulti(row_f, col_f);
+    auto res = WinogradMulti(row_f, col_f);
 
-  if (!even_) IfNotEven(res);
+    if (!even_) IfNotEven(res);
 
-  return res;
+    standart_result_ = std::move(res);
+  }
 }
 
 std::vector<double> Model::RowFactor() {
   std::vector<double> result(row_one);
   for (int row = 0; row < row_one; ++row) {
-    for (int j = 0; j < half_; ++j)
+    for (int j = 0; j < half_; ++j) {
       result[row] += in_1_[row][2 * j] * in_1_[row][2 * j + 1];
+    }
   }
   return result;
 }
@@ -67,16 +69,19 @@ void Model::IfNotEven(std::vector<std::vector<double>>& result) {
       result[row][col] += in_1_[row][row_two - 1] * in_2_[row_two - 1][col];
 }
 
-std::vector<std::vector<double>> Model::Parallel() {
-  auto row_f = RowFactorParallel();
+void Model::Parallel(int loops) {
+  int counter = 0;
+  while (counter++ < loops) {
+    auto row_f = RowFactorParallel();
 
-  auto col_f = ColFactorParallel();
+    auto col_f = ColFactorParallel();
 
-  auto res = WinogradMultiParallel(row_f, col_f);
+    auto res = WinogradMultiParallel(row_f, col_f);
 
-  if (!even_) IfNotEvenParallel(res);
+    if (!even_) IfNotEvenParallel(res);
 
-  return res;
+    parallel_result_ = std::move(res);
+  }
 }
 
 std::vector<double> Model::RowFactorParallel() {
@@ -125,92 +130,151 @@ void Model::IfNotEvenParallel(std::vector<std::vector<double>>& result) {
       result[row][col] += in_1_[row][row_two - 1] * in_2_[row_two - 1][col];
 }
 
-std::vector<std::vector<double>> Model::Pipeline() {
-  std::vector<std::vector<double>> result_matrix(row_one);
-  for (auto& row : result_matrix) row.resize(col_two);
+void Model::Pipeline(int loops) {
+  int counter = 0;
+  while (counter++ < loops) {
+    std::vector<std::vector<double>> result_matrix(row_one);
+    for (auto& row : result_matrix) row.resize(col_two);
 
-  TSQueue<int> t1_q;
-  TSQueue<int> t2_q;
-  TSQueue<int> t3_q;
+    TSQueue<int> t1_q;
+    TSQueue<int> t2_q;
+    TSQueue<int> t3_q;
 
-  auto col_factor = ColFactorParallel();
-  auto row_factor = RowFactorParallel();
+    auto col_factor = ColFactorParallel();
+    auto row_factor = RowFactorParallel();
 
-  std::thread t1([&]() {
+    std::thread t1([&]() {
 // std::cout << "T1 START" << std::endl;
 #pragma omp parallel for schedule(dynamic)
-    for (int row = 0; row < row_one; ++row) {
-      for (int col = 0; col < col_two; ++col) {
-        for (auto k = 0; k < half_; ++k) {
+      for (int row = 0; row < row_one; ++row) {
+        for (int col = 0; col < col_two; ++col) {
+          for (auto k = 0; k < half_; ++k) {
+            result_matrix[row][col] +=
+                (in_1_[row][2 * k] + in_2_[2 * k + 1][col]) *
+                (in_1_[row][2 * k + 1] + in_2_[2 * k][col]);
+          }
+        }
+        t1_q.push(1);
+      }
+      // std::cout << "T1 END" << std::endl;
+    });
+
+    std::thread t2([&]() {
+      // std::cout << "T2 START" << std::endl;
+      for (int row = 0; row < row_one; ++row) {
+        t1_q.pop();
+        for (int col = 0; col < col_two; ++col) {
+          result_matrix[row][col] += -row_factor[row];
+        }
+        t2_q.push(1);
+      }
+      // std::cout << "T2 END" << std::endl;
+    });
+
+    std::thread t3([&]() {
+      // std::cout << "T3 START" << std::endl;
+      for (int row = 0; row < row_one; ++row) {
+        t2_q.pop();
+        for (int col = 0; col < col_two; ++col) {
+          result_matrix[row][col] -= col_factor[col];
+        }
+        t3_q.push(1);
+      }
+      // std::cout << "T3 END" << std::endl;
+    });
+
+    std::thread t4([&]() {
+      // std::cout << "T4 START" << std::endl;
+      if (even_) return;
+      for (int row = 0; row < row_one; ++row) {
+        t3_q.pop();
+        for (int col = 0; col < col_two; ++col) {
           result_matrix[row][col] +=
-              (in_1_[row][2 * k] + in_2_[2 * k + 1][col]) *
-              (in_1_[row][2 * k + 1] + in_2_[2 * k][col]);
+              in_1_[row][row_two - 1] * in_2_[row_two - 1][col];
         }
       }
-      t1_q.push(1);
-    }
-    // std::cout << "T1 END" << std::endl;
-  });
+      // std::cout << "T4 END" << std::endl;
+    });
 
-  std::thread t2([&]() {
-    // std::cout << "T2 START" << std::endl;
-    for (int row = 0; row < row_one; ++row) {
-      t1_q.pop();
-      for (int col = 0; col < col_two; ++col) {
-        result_matrix[row][col] += -row_factor[row];
-      }
-      t2_q.push(1);
-    }
-    // std::cout << "T2 END" << std::endl;
-  });
+    if (t1.joinable()) t1.join();
+    if (t2.joinable()) t2.join();
+    if (t3.joinable()) t3.join();
+    if (t4.joinable()) t4.join();
 
-  std::thread t3([&]() {
-    // std::cout << "T3 START" << std::endl;
-    for (int row = 0; row < row_one; ++row) {
-      t2_q.pop();
-      for (int col = 0; col < col_two; ++col) {
-        result_matrix[row][col] -= col_factor[col];
-      }
-      t3_q.push(1);
-    }
-    // std::cout << "T3 END" << std::endl;
-  });
-
-  std::thread t4([&]() {
-    // std::cout << "T4 START" << std::endl;
-    if (even_) return;
-    for (int row = 0; row < row_one; ++row) {
-      t3_q.pop();
-      for (int col = 0; col < col_two; ++col) {
-        result_matrix[row][col] +=
-            in_1_[row][row_two - 1] * in_2_[row_two - 1][col];
-      }
-    }
-    // std::cout << "T4 END" << std::endl;
-  });
-
-  if (t1.joinable()) t1.join();
-  if (t2.joinable()) t2.join();
-  if (t3.joinable()) t3.join();
-  if (t4.joinable()) t4.join();
-
-  return result_matrix;
+    pipeline_result_ = std::move(result_matrix);
+  }
 }
 
-void Model::Load(std::vector<std::vector<double>>& matrix,
-                 const std::string& path) {
-  std::ifstream in(path);
-  std::string temp;
-  double x;
-  int c = 0;
+bool Model::LoadMatrix(const std::string& f_path, const std::string& s_path) {
+  return (LoadLogicFirst(f_path, in_1_) && LoadLogicSecond(s_path, in_2_))
+             ? true
+             : false;
+}
 
-  while (getline(in, temp)) {
-    std::istringstream ss(temp);
-    while (ss >> x) {
-      matrix[c].emplace_back(x);
+bool Model::LoadLogicFirst(const std::string& path,
+                           std::vector<std::vector<double>>& matrix) {
+  std::ifstream in(path);
+  if (in.bad()) return false;
+  std::string temp;
+  std::getline(in, temp);
+  std::istringstream ss(temp);
+
+  matrix.clear();
+
+  ss >> row_one >> col_one;
+  if (row_one < 1 || col_one < 1) return false;
+
+  matrix.resize(row_one);
+  for (auto& m : matrix) m.reserve(col_one);
+
+  for (int i = 0; i < row_one; ++i) {
+    std::getline(in, temp);
+    std::istringstream ss_in(temp);
+
+    double x;
+    int c = 0;
+    while (ss_in >> x || !ss_in.eof()) {
+      if (ss_in.fail()) return false;
+      matrix[i].emplace_back(x);
+      c++;
     }
-    c++;
+
+    if (c != col_one) return false;
   }
+  return true;
+}
+
+bool Model::LoadLogicSecond(const std::string& path,
+                            std::vector<std::vector<double>>& matrix) {
+  std::ifstream in(path);
+  if (in.bad()) return false;
+  std::string temp;
+  std::getline(in, temp);
+  std::istringstream ss(temp);
+
+  matrix.clear();
+
+  ss >> row_two >> col_two;
+  if (row_two < 1 || col_two < 1) return false;
+
+  matrix.resize(row_two);
+  for (auto& m : matrix) m.reserve(col_two);
+
+  for (int i = 0; i < row_two; ++i) {
+    std::getline(in, temp);
+    std::istringstream ss_in(temp);
+
+    double x;
+    int c = 0;
+    while (ss_in >> x || !ss_in.eof()) {
+      if (ss_in.fail()) return false;
+      matrix[i].emplace_back(x);
+      c++;
+    }
+
+    if (c != col_two) return false;
+  }
+  return true;
 }
 
 }  // namespace s21

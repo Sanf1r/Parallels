@@ -29,9 +29,11 @@ class View {
 
   bool Load();
 
-  bool LoadCheck(bool flag);
-
   bool WinIntro();
+
+  void WinStandart(int loops);
+  void WinParallel(int loops);
+  void WinPipeline(int loops);
 };
 }  // namespace s21
 

@@ -20,14 +20,15 @@ namespace s21 {
 
 class Model {
  public:
-  Model(std::vector<std::vector<double>>& in_1,
-        std::vector<std::vector<double>>& in_2);
+  Model() = default;
 
-  std::vector<std::vector<double>> Standart();
+  bool LoadMatrix(const std::string& f_path, const std::string& s_path);
 
-  std::vector<std::vector<double>> Parallel();
+  void BeforeCalculation(int thread_num);
 
-  std::vector<std::vector<double>> Pipeline();
+  void Standart(int loops);
+  void Parallel(int loops);
+  void Pipeline(int loops);
 
  private:
   std::vector<std::vector<double>> in_1_;
@@ -38,6 +39,15 @@ class Model {
   int col_two = 0;
   int half_ = 0;
   bool even_ = false;
+
+  std::vector<std::vector<double>> standart_result_;
+  std::vector<std::vector<double>> parallel_result_;
+  std::vector<std::vector<double>> pipeline_result_;
+
+  bool LoadLogicFirst(const std::string& f_path,
+                      std::vector<std::vector<double>>& matrix);
+  bool LoadLogicSecond(const std::string& s_path,
+                       std::vector<std::vector<double>>& matrix);
 
   std::vector<double> RowFactor();
   std::vector<double> ColFactor();

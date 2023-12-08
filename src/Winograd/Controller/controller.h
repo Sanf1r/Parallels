@@ -1,5 +1,5 @@
-#ifndef SRC_CONTROLLER_CONTROLLER_H_
-#define SRC_CONTROLLER_CONTROLLER_H_
+#ifndef PARALLELS_SRC_WINOGRAD_CONTROLLER_CONTROLLER_H_
+#define PARALLELS_SRC_WINOGRAD_CONTROLLER_CONTROLLER_H_
 
 #include "../Model/model.h"
 
@@ -10,8 +10,8 @@ class Controller {
   Controller() = delete;
   explicit Controller(Model* m) : model_(m){};
 
-  void BeforeCalculation(int thread_num) {
-    model_->BeforeCalculation(thread_num);
+  bool BeforeCalculation(int thread_num) {
+    return model_->BeforeCalculation(thread_num);
   }
 
   void Standart(int loops) { model_->Standart(loops); }
@@ -26,9 +26,13 @@ class Controller {
     return model_->LoadMatrix(f_path, s_path);
   }
 
+  void GenerateMatrix(int f_rows, int f_cols, int s_rows, int s_cols) {
+    model_->GenerateMatrix(f_rows, f_cols, s_rows, s_cols);
+  }
+
  private:
   Model* model_;
 };
 }  // namespace s21
 
-#endif  //  SRC_CONTROLLER_CONTROLLER_H_
+#endif  //  PARALLELS_SRC_WINOGRAD_CONTROLLER_CONTROLLER_H_

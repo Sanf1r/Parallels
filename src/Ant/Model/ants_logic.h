@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_ANTS_LOGIC_H_
-#define SRC_MODEL_ANTS_LOGIC_H_
+#ifndef PARALLELS_SRC_ANT_MODEL_ANTS_LOGIC_H_
+#define PARALLELS_SRC_ANT_MODEL_ANTS_LOGIC_H_
 
 #include <algorithm>
 #include <execution>
@@ -51,4 +51,4 @@ class AntsLogic {
 };
 }  // namespace s21
 
-#endif  //  SRC_MODEL_ANTS_LOGIC_H_
+#endif  //  PARALLELS_SRC_ANT_MODEL_ANTS_LOGIC_H_

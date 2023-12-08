@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_MATRIX_H_
-#define SRC_MODEL_MATRIX_H_
+#ifndef PARALLELS_SRC_WINOGRAD_MODEL_MATRIX_H_
+#define PARALLELS_SRC_WINOGRAD_MODEL_MATRIX_H_
 
 #include <iostream>
 #include <vector>
@@ -39,4 +39,4 @@ class Matrix {
 };
 }  // namespace s21
 
-#endif  //  SRC_MODEL_MATRIX_H_
+#endif  //  PARALLELS_SRC_WINOGRAD_MODEL_MATRIX_H_

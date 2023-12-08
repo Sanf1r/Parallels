@@ -1,5 +1,5 @@
-#ifndef SRC_CONTROLLER_CONTROLLER_H_
-#define SRC_CONTROLLER_CONTROLLER_H_
+#ifndef PARALLELS_SRC_ANT_CONTROLLER_CONTROLLER_H_
+#define PARALLELS_SRC_ANT_CONTROLLER_CONTROLLER_H_
 
 #include "../Model/model.h"
 
@@ -22,8 +22,6 @@ class Controller {
     return model_->LoadGraphFromFile(path);
   }
 
-  bool UndirectedCheck() { return model_->UndirectedCheck(); }
-
   int GetSize() { return model_->GetSize(); }
 
  private:
@@ -31,4 +29,4 @@ class Controller {
 };
 }  // namespace s21
 
-#endif  //  SRC_CONTROLLER_CONTROLLER_H_
+#endif  //  A3_PARALLELS_SRC_ANT_CONTROLLER_CONTROLLER_H_

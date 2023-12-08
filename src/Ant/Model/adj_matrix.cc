@@ -30,16 +30,16 @@ void AdjMatrix::Print() {
 
 void AdjMatrix::Clear() { data_.clear(); }
 
-double& AdjMatrix::operator()(int row, int columns) {
+double &AdjMatrix::operator()(int row, int columns) {
   return data_[row * offset_ + columns];
 }
 
-const double& AdjMatrix::operator()(int row, int columns) const {
+const double &AdjMatrix::operator()(int row, int columns) const {
   return data_[row * offset_ + columns];
 }
 
-std::vector<double>& AdjMatrix::GetData() { return data_; }
+std::vector<double> &AdjMatrix::GetData() { return data_; }
 
-const std::vector<double>& AdjMatrix::GetData() const { return data_; }
+const std::vector<double> &AdjMatrix::GetData() const { return data_; }
 
 }  // namespace s21

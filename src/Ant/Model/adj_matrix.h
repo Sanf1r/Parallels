@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_ADJ_MATRIX_H_
-#define SRC_MODEL_ADJ_MATRIX_H_
+#ifndef PARALLELS_SRC_ANT_MODEL_ADJ_MATRIX_H_
+#define PARALLELS_SRC_ANT_MODEL_ADJ_MATRIX_H_
 
 #include <cmath>
 #include <iostream>
@@ -35,4 +35,4 @@ class AdjMatrix {
 };
 }  // namespace s21
 
-#endif  //  SRC_MODEL_ADJ_MATRIX_H_
+#endif  //  PARALLELS_SRC_ANT_MODEL_ADJ_MATRIX_H_

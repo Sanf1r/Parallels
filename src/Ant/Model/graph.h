@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_GRAPH_H_
-#define SRC_MODEL_GRAPH_H_
+#ifndef PARALLELS_SRC_ANT_MODEL_GRAPH_H_
+#define PARALLELS_SRC_ANT_MODEL_GRAPH_H_
 
 #include <cmath>
 #include <fstream>
@@ -28,17 +28,11 @@ class Graph {
 
   bool LoadGraphFromFile(const std::string& path);
 
-  bool ExportGraphToDot(const std::string& path);
-
  private:
   int size_ = 0;
   AdjMatrix data_;
 };
 
-struct TsmResult {
-  std::vector<int> vertices;
-  double distance = 0;
-};
 }  // namespace s21
 
-#endif  //  SRC_MODEL_GRAPH_H_
+#endif  //  PARALLELS_SRC_ANT_MODEL_GRAPH_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_VIEW_VIEW_H_
-#define SRC_VIEW_VIEW_H_
+#ifndef PARALLELS_SRC_WINOGRAD_VIEW_VIEW_H_
+#define PARALLELS_SRC_WINOGRAD_VIEW_VIEW_H_
 
 #include <chrono>
 #include <cmath>
@@ -17,19 +17,25 @@ namespace s21 {
 class View {
  public:
   explicit View(Controller* c);
-  void DisplayMenu();
 
-  int PerformChoice();
   void StartEventLoop();
 
  private:
   Controller* c_;
 
-  bool Input(int* loops);
+  void DisplayMenu();
+  int PerformChoice();
+
+  bool InputLoops(int* loops);
+  bool InputThreads(int* threads_num);
+  bool OutputResult(int* output_res);
 
   bool Load();
 
-  bool WinIntro();
+  void WinIntro();
+
+  bool MatrixMode();
+  bool Generate();
 
   void WinStandart(int loops);
   void WinParallel(int loops);
@@ -37,4 +43,4 @@ class View {
 };
 }  // namespace s21
 
-#endif  //  SRC_VIEW_VIEW_H_
+#endif  //  PARALLELS_SRC_WINOGRAD_VIEW_VIEW_H_

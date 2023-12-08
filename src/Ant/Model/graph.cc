@@ -10,7 +10,7 @@ namespace s21 {
  * @return true
  * @return false
  */
-bool Graph::LoadGraphFromFile(const std::string& filename) {
+bool Graph::LoadGraphFromFile(const std::string &filename) {
   std::ifstream file(filename);
   if (file.bad()) return false;
   std::string temp;
@@ -40,40 +40,6 @@ bool Graph::LoadGraphFromFile(const std::string& filename) {
       c++;
     }
     if (c != size_) return false;
-  }
-  return true;
-}
-
-/**
- * @brief Выгрузка графа в файл в формате dot (см. материалы)
- *
- * @param filename
- */
-bool Graph::ExportGraphToDot(const std::string& filename) {
-  if (size_ != 0) {
-    bool showLabel = true;
-    bool showDir = false;
-    std::ofstream f(filename);
-    f << "digraph G {" << std::endl;
-    for (int i = 0; i < size_; ++i) {
-      for (int j = i; j < size_; ++j) {
-        if (data_(i, j) != 0) {
-          std::string dir = "none";
-          if (showDir) dir = "forward";
-          if (showLabel) {
-            f << i + 1 << " -> " << j + 1 << " [dir=" << dir
-              << " label=" << data_(i, j) << "]" << std::endl;
-          } else {
-            f << i + 1 << " -> " << j + 1 << " [dir=" << dir << "]"
-              << std::endl;
-          }
-        }
-      }
-    }
-    f << "}" << std::endl;
-    f.close();
-  } else {
-    return false;
   }
   return true;
 }

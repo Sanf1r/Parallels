@@ -1,5 +1,5 @@
-#ifndef SRC_VIEW_VIEW_H_
-#define SRC_VIEW_VIEW_H_
+#ifndef PARALLELS_SRC_ANT_VIEW_VIEW_H_
+#define PARALLELS_SRC_ANT_VIEW_VIEW_H_
 
 #include <chrono>
 #include <cmath>
@@ -29,12 +29,10 @@ class View {
 
   bool Load();
 
-  bool LoadCheck(bool flag);
-
   bool TspIntro();
   void Tsp(int loops);
   void TspParallel(int loops);
 };
 }  // namespace s21
 
-#endif  //  SRC_VIEW_VIEW_H_
+#endif  //  PARALLELS_SRC_ANT_VIEW_VIEW_H_

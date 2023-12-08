@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_ANT_H_
-#define SRC_MODEL_ANT_H_
+#ifndef PARALLELS_SRC_ANT_MODEL_ANT_H_
+#define PARALLELS_SRC_ANT_MODEL_ANT_H_
 
 #include <random>
 #include <set>
@@ -7,6 +7,11 @@
 #include "graph.h"
 
 namespace s21 {
+
+struct TsmResult {
+  std::vector<int> vertices;
+  double distance = 0;
+};
 
 class Ant {
  public:
@@ -40,4 +45,4 @@ class Ant {
 };
 }  // namespace s21
 
-#endif  //  SRC_MODEL_ANT_H_
+#endif  //  PARALLELS_SRC_ANT_MODEL_ANT_H_

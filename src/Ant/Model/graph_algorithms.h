@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_GRAPH_ALGORITHMS_H_
-#define SRC_MODEL_GRAPH_ALGORITHMS_H_
+#ifndef PARALLELS_SRC_ANT_MODEL_GRAPH_ALGORITHMS_H_
+#define PARALLELS_SRC_ANT_MODEL_GRAPH_ALGORITHMS_H_
 
 #include <algorithm>
 #include <random>
@@ -16,13 +16,8 @@ class GraphAlgorithms {
   TsmResult SolveSalesmansProblem(const Graph& graph, int loops);
 
   TsmResult SolveSalesmansProblemParallel(const Graph& graph, int loops);
-
-  bool UndirectedCheck(const Graph& graph);
-
- private:
-  int Random(int size);
 };
 
 }  // namespace s21
 
-#endif  //  SRC_MODEL_GRAPH_ALGORITHMS_H_
+#endif  //  PARALLELS_SRC_ANT_MODEL_GRAPH_ALGORITHMS_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_MODEL_H_
-#define SRC_MODEL_MODEL_H_
+#ifndef PARALLELS_SRC_ANT_MODEL_MODEL_H_
+#define PARALLELS_SRC_ANT_MODEL_MODEL_H_
 
 #include <algorithm>
 #include <cmath>
@@ -35,6 +35,7 @@ class Model {
   Graph graph_;
   GraphAlgorithms ga_;
 };
+
 }  // namespace s21
 
-#endif  //  SRC_MODEL_MODEL_H_
+#endif  //  PARALLELS_SRC_ANT_MODEL_MODEL_H_

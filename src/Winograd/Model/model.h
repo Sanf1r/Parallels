@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_WINOGRAD_H_
-#define SRC_MODEL_WINOGRAD_H_
+#ifndef PARALLELS_SRC_WINOGRAD_MODEL_MODEL_H_
+#define PARALLELS_SRC_WINOGRAD_MODEL_MODEL_H_
 
 #include <omp.h>
 
@@ -10,6 +10,7 @@
 #include <mutex>
 #include <ostream>
 #include <queue>
+#include <random>
 #include <sstream>
 #include <thread>
 #include <vector>
@@ -24,8 +25,9 @@ class Model {
   Model() = default;
 
   bool LoadMatrix(const std::string& f_path, const std::string& s_path);
+  void GenerateMatrix(int f_rows, int f_cols, int s_rows, int s_cols);
 
-  void BeforeCalculation(int thread_num);
+  bool BeforeCalculation(int thread_num);
 
   void Standart(int loops);
   void Parallel(int loops);
@@ -38,10 +40,10 @@ class Model {
  private:
   Matrix in_1_;
   Matrix in_2_;
-  int row_one = 0;
-  int col_one = 0;
-  int row_two = 0;
-  int col_two = 0;
+  int row_one_ = 0;
+  int col_one_ = 0;
+  int row_two_ = 0;
+  int col_two_ = 0;
   int half_ = 0;
   bool even_ = false;
 
@@ -50,19 +52,21 @@ class Model {
   Matrix pipeline_result_;
 
   bool LoadLogic(const std::string& path, Matrix& matrix);
+  void GenerateLogic(int rows, int cols, Matrix& matrix);
 
   std::vector<double> RowFactor();
   std::vector<double> ColFactor();
-  void WinogradMulti(std::vector<double>& row_f, std::vector<double>& col_f);
+  void WinogradMulti(const std::vector<double>& row_f,
+                     const std::vector<double>& col_f);
   void IfNotEven();
 
   std::vector<double> RowFactorParallel();
   std::vector<double> ColFactorParallel();
-  void WinogradMultiParallel(std::vector<double>& row_f,
-                             std::vector<double>& col_f);
+  void WinogradMultiParallel(const std::vector<double>& row_f,
+                             const std::vector<double>& col_f);
   void IfNotEvenParallel();
 };
 
 }  // namespace s21
 
-#endif  //  SRC_MODEL_WINOGRAD_H_
+#endif  //  PARALLELS_SRC_WINOGRAD_MODEL_MODEL_H_

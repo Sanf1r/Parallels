@@ -1,5 +1,5 @@
-#ifndef MODEL_TSQUEUE_H_
-#define MODEL_TSQUEUE_H_
+#ifndef PARALLELS_SRC_WINOGRAD_MODEL_TSQUEUE_H_
+#define PARALLELS_SRC_WINOGRAD_MODEL_TSQUEUE_H_
 
 #include <condition_variable>
 #include <mutex>
@@ -10,32 +10,32 @@ namespace s21 {
 template <typename T>
 class TSQueue {
  private:
-  std::queue<T> m_queue;
+  std::queue<T> m_queue_;
 
-  std::mutex m_mutex;
+  std::mutex m_mutex_;
 
-  std::condition_variable m_cond;
+  std::condition_variable m_cond_;
 
  public:
   void push(T item) {
-    std::unique_lock<std::mutex> lock(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex_);
 
-    m_queue.push(item);
+    m_queue_.push(item);
 
-    m_cond.notify_one();
+    m_cond_.notify_one();
   }
 
   T pop() {
-    std::unique_lock<std::mutex> lock(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex_);
 
-    m_cond.wait(lock, [this]() { return !m_queue.empty(); });
+    m_cond_.wait(lock, [this]() { return !m_queue_.empty(); });
 
-    T item = m_queue.front();
-    m_queue.pop();
+    T item = m_queue_.front();
+    m_queue_.pop();
 
     return item;
   }
 };
 }  // namespace s21
 
-#endif  //  MODEL_TSQUEUE_H_
+#endif  //  PARALLELS_SRC_WINOGRAD_MODEL_TSQUEUE_H_

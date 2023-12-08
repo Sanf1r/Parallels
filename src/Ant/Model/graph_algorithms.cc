@@ -12,36 +12,16 @@ namespace s21 {
  * @param graph
  * @return TsmResult
  */
-TsmResult GraphAlgorithms::SolveSalesmansProblem(const Graph& graph,
+TsmResult GraphAlgorithms::SolveSalesmansProblem(const Graph &graph,
                                                  int loops) {
   AntsLogic al_(graph);
   return al_.SolveSalesmansProblem(loops);
 }
 
-TsmResult GraphAlgorithms::SolveSalesmansProblemParallel(const Graph& graph,
+TsmResult GraphAlgorithms::SolveSalesmansProblemParallel(const Graph &graph,
                                                          int loops) {
   AntsLogic al_(graph);
   return al_.SolveSalesmansProblemParallel(loops);
-}
-
-bool GraphAlgorithms::UndirectedCheck(const Graph& graph) {
-  bool res = true;
-  int graph_size = graph.GetSize();
-  for (auto i = 0; i < graph_size; ++i) {
-    for (auto j = i; j < graph_size; ++j) {
-      if (graph(i, j) != graph(j, i)) {
-        res = false;
-      }
-    }
-  }
-  return res;
-}
-
-int GraphAlgorithms::Random(int size) {
-  std::random_device rd;
-  std::mt19937 rng(rd());
-  std::uniform_int_distribution<int> gen(0, size - 1);
-  return gen(rng);
 }
 
 }  // namespace s21

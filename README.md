@@ -4,7 +4,7 @@ Implementation of the Parallels project.
 
 Tested on MacOS Ventura 13.6.4.
 
-Made on November 22 2023 as part of my education in School 21 :)
+Made on December 8 2023 as part of my education in School 21 :)
 
 # Information
 
